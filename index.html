@@ -2013,15 +2013,16 @@
     <div class="soft-bubble" style="left:89%; width:10px; height:10px; --dur:19s; --drift:12px; animation-delay:6s;"></div>
   </div>
 
-  <!-- Loading Screen: Delicate Line-Art Fish + Italic Subtitle -->
-  <div id="loading-screen" style="position:fixed; inset:0; z-index:9000; background:var(--bg-1); display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.5s ease;">
+  <!-- Loading Screen / Entrance Gate: Delicate Line-Art Fish + Italic Subtitle -->
+  <div id="loading-screen" style="position:fixed; inset:0; width:100%; height:100dvh; min-height:100dvh; z-index:9000; background:var(--bg-1); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; text-align:center; transition:opacity 0.55s ease;">
     <svg width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="var(--accent)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="animation: gentleSpin 8s linear infinite;">
       <path d="M46 24C40 16 26 16 18 26C12 33 14 44 22 48C30 52 42 48 48 38" />
       <path d="M46 24C52 22 56 16 56 16C54 24 56 30 56 30C52 28 46 24 46 24Z" fill="var(--accent-soft-bg)"/>
       <circle cx="24" cy="28" r="1.5" fill="var(--accent)"/>
       <circle cx="32" cy="12" r="2" stroke="var(--accent-2)"/>
     </svg>
-    <p class="subtitle-italic" style="margin-top:14px; font-size:17px;">đang lặn xuống biển…</p>
+    <p id="loading-screen-prompt" class="subtitle-italic" style="margin-top:14px; font-size:17px; transition:opacity 0.35s ease; user-select:none;">đang lặn xuống biển…</p>
+    <button id="loading-screen-mute-enter" type="button" class="subtitle-italic" style="margin-top:12px; background:none; border:none; padding:6px 14px; font-size:13px; color:var(--ink-soft); opacity:0; visibility:hidden; pointer-events:none; cursor:pointer; transition:opacity 0.35s ease; user-select:none;">vào không nhạc</button>
   </div>
 
   <!-- Toast Container -->
@@ -4167,6 +4168,18 @@
       return true;
     }
 
+    function previewMiniPlayerTrackInfo() {
+      const store = getStore();
+      const tracks = store.musicTracks || [];
+      updatePlaylistUI();
+      if (tracks.length === 0) return;
+      if (!currentTrackId || !tracks.some(t => t.id === currentTrackId)) {
+        const first = tracks[0];
+        if (trackTitle) trackTitle.textContent = first.title;
+        setPlayerStatusText(first.artist || "Aura of Sea", false);
+      }
+    }
+
     // 4. Promise rejection handling for audio.play()
     function playSingletonAudio(options) {
       const isAutoplayAttempt = Boolean(options && options.isAutoplayAttempt);
@@ -4191,9 +4204,7 @@
             return;
           }
           if (errName === 'NotAllowedError') {
-            // Browser blocked autoplay; wait for first user interaction without showing error
             updatePlayerUI();
-            armFirstInteractionAutoplayUnlock();
             return;
           }
           const code = audio.error ? audio.error.code : 4;
@@ -4205,43 +4216,28 @@
       }
     }
 
-    // 5. Autoplay on page load + one-time capture-phase fallback on first user gesture
-    const AUTOPLAY_CAPTURE_EVENTS = ['pointerup', 'mousedown', 'keydown', 'touchend', 'click'];
-    let interactionUnlockArmed = false;
+    // 5. Synchronous random shuffle playback triggered directly inside the entrance gate user gesture
+    function startRandomShufflePlaybackFromGate() {
+      if (window.__oceanGateMusicStarted) return;
+      window.__oceanGateMusicStarted = true;
+      window.__oceanAutoplayCompleted = true;
 
-    function removeFirstInteractionListeners() {
-      if (!interactionUnlockArmed) return;
-      interactionUnlockArmed = false;
-      AUTOPLAY_CAPTURE_EVENTS.forEach((evtName) => {
-        window.removeEventListener(evtName, handleFirstUserInteractionCapture, true);
-      });
-    }
+      const store = getStore();
+      const tracks = store.musicTracks || [];
+      if (tracks.length === 0) return;
 
-    function handleFirstUserInteractionCapture(e) {
-      if (window.__oceanAutoplayCompleted) {
-        removeFirstInteractionListeners();
-        return;
-      }
-      const target = e && e.target && typeof e.target.closest === 'function' ? e.target : null;
-      // If user's very first interaction is clicking Prev/Next or a specific track in Playlist,
-      // let that control's own handler run and mark autoplay as completed so we don't override their track choice.
-      if (target && (target.closest('[onclick*="prevTrack"]') || target.closest('[onclick*="nextTrack"]') || target.closest('[onclick*="selectTrack"]'))) {
-        window.__oceanAutoplayCompleted = true;
-        removeFirstInteractionListeners();
-        return;
-      }
+      // Pick a random opening track using Fisher-Yates shuffle queue synchronously
+      refillShuffleQueue(null);
+      const firstRandomId = shuffleQueue.shift() || tracks[0].id;
+      const firstIdx = tracks.findIndex(t => t.id === firstRandomId);
+      loadTrack(firstIdx !== -1 ? firstIdx : 0, { recordHistory: true });
 
-      if (!audio.getAttribute('src')) {
-        if (!ensureInitialRandomTrackLoaded()) return;
-      }
+      failedTrackIdsInRound.clear();
+      wantsToPlay = true;
 
       const playPromise = audio.play();
       if (playPromise && typeof playPromise.then === 'function') {
-        lastAutoplayUnlockTs = Date.now();
         playPromise.then(() => {
-          window.__oceanAutoplayCompleted = true;
-          lastAutoplayUnlockTs = Date.now();
-          removeFirstInteractionListeners();
           clearAudioLoadTimeout();
           failedTrackIdsInRound.clear();
           const t = getCurrentTrackObj();
@@ -4249,83 +4245,21 @@
           updatePlayerUI();
         }).catch((err) => {
           const errName = err && err.name ? err.name : '';
-          if (errName === 'NotAllowedError') {
-            // Keep capture listener active for the ensuing pointerup/touchend/click if mousedown wasn't treated as activation
-            return;
-          }
-          window.__oceanAutoplayCompleted = true;
-          removeFirstInteractionListeners();
           if (errName === 'AbortError') return;
-          const code = audio.error ? audio.error.code : 4;
-          console.log('[Music] Lỗi play() sau tương tác (' + errName + ') | audio.src thực tế:', audio.currentSrc || audio.src, '| audio.error.code:', code);
-          if (errName === 'NotSupportedError') {
-            wantsToPlay = true;
-            handleCandidateErrorOrFallback(code, false);
-          }
-        });
-      } else {
-        window.__oceanAutoplayCompleted = true;
-        removeFirstInteractionListeners();
-      }
-    }
-
-    function armFirstInteractionAutoplayUnlock() {
-      if (window.__oceanAutoplayCompleted || interactionUnlockArmed) return;
-      interactionUnlockArmed = true;
-      AUTOPLAY_CAPTURE_EVENTS.forEach((evtName) => {
-        window.addEventListener(evtName, handleFirstUserInteractionCapture, true);
-      });
-    }
-
-    function initMusicAutoplayOnce() {
-      if (window.__oceanAutoplayInitAttempted) return;
-      const store = getStore();
-      const tracks = store.musicTracks || [];
-      if (tracks.length === 0) return;
-
-      window.__oceanAutoplayInitAttempted = true;
-      // Requirement 3: Pick a random track as the opening track using Fisher-Yates shuffle queue
-      refillShuffleQueue(null);
-      const firstRandomId = shuffleQueue.shift() || tracks[0].id;
-      const firstIdx = tracks.findIndex(t => t.id === firstRandomId);
-      loadTrack(firstIdx !== -1 ? firstIdx : 0, { recordHistory: true });
-      wantsToPlay = true;
-
-      const playPromise = audio.play();
-      if (playPromise && typeof playPromise.then === 'function') {
-        playPromise.then(() => {
-          window.__oceanAutoplayCompleted = true;
-          removeFirstInteractionListeners();
-          clearAudioLoadTimeout();
-          failedTrackIdsInRound.clear();
-          updatePlayerUI();
-        }).catch((err) => {
-          const errName = err && err.name ? err.name : '';
           if (errName === 'NotAllowedError') {
-            // Silently wait for user's first interaction in capture phase
             updatePlayerUI();
-            armFirstInteractionAutoplayUnlock();
             return;
           }
-          if (errName === 'AbortError') return;
           const code = audio.error ? audio.error.code : 4;
-          console.log('[Music] Lỗi autoplay (' + errName + ') | audio.src thực tế:', audio.currentSrc || audio.src, '| audio.error.code:', code);
-          if (errName === 'NotSupportedError') {
-            handleCandidateErrorOrFallback(code, false);
-          }
+          console.log('[Music] Lỗi play() từ cổng vào (' + (errName || 'Error') + ') | audio.src thực tế:', audio.currentSrc || audio.src, '| audio.error.code:', code);
+          handleCandidateErrorOrFallback(code, false);
         });
       }
+      updatePlayerUI();
     }
 
     window.togglePlayMusic = function() {
-      // Prevent first-tap on Play/Pause button from reversing playback that just unlocked in capture phase
-      if (lastAutoplayUnlockTs && (Date.now() - lastAutoplayUnlockTs < 450) && !audio.paused) {
-        lastAutoplayUnlockTs = 0;
-        updatePlayerUI();
-        return;
-      }
       window.__oceanAutoplayCompleted = true;
-      removeFirstInteractionListeners();
 
       if (!audio.getAttribute('src')) {
         ensureInitialRandomTrackLoaded();
@@ -4344,7 +4278,6 @@
     // Requirement 4 & 8: Advance to next track in the Fisher-Yates shuffle queue (or repeat if 1 track)
     window.nextTrack = function() {
       window.__oceanAutoplayCompleted = true;
-      removeFirstInteractionListeners();
       const store = getStore();
       const tracks = store.musicTracks || [];
       if (tracks.length === 0) return;
@@ -4371,7 +4304,6 @@
     // Requirement 5: "Trước" steps back through playHistory; if no previous track in history, restart current track from 0:00
     window.prevTrack = function() {
       window.__oceanAutoplayCompleted = true;
-      removeFirstInteractionListeners();
       const store = getStore();
       const tracks = store.musicTracks || [];
       if (tracks.length === 0) return;
@@ -4471,7 +4403,6 @@
     // Requirement 6: Selecting a specific track plays it immediately, records it in history, and removes it from remaining shuffleQueue
     window.selectTrack = function(idx) {
       window.__oceanAutoplayCompleted = true;
-      removeFirstInteractionListeners();
       const store = getStore();
       const tracks = store.musicTracks || [];
       if (idx < 0 || idx >= tracks.length) return;
@@ -5362,8 +5293,124 @@
       } catch (_) {}
     }
 
+    let entranceGateReady = false;
+    let entranceGateDismissed = false;
+    let gateSongsLoaded = false;
+    let gateCharactersLoaded = false;
+    let gateFallbackTimer = null;
+
+    function dismissEntranceGateUI() {
+      const loader = document.getElementById('loading-screen');
+      const muteBtn = document.getElementById('loading-screen-mute-enter');
+      window.removeEventListener('keydown', handleEntranceGateKeydown);
+      if (loader) {
+        loader.removeEventListener('click', handleGateEnterWithMusic);
+        loader.style.pointerEvents = 'none';
+        loader.style.opacity = '0';
+        setTimeout(() => {
+          if (loader.parentNode) loader.remove();
+        }, 550);
+      }
+      if (muteBtn) {
+        muteBtn.removeEventListener('click', handleGateEnterWithoutMusic);
+      }
+    }
+
+    function handleGateEnterWithMusic(e) {
+      if (!entranceGateReady || entranceGateDismissed) return;
+      const muteBtn = document.getElementById('loading-screen-mute-enter');
+      if (e && muteBtn && (e.target === muteBtn || muteBtn.contains(e.target))) {
+        return;
+      }
+      entranceGateDismissed = true;
+      window.__oceanGateEntered = true;
+
+      // Requirement 3: Call random shuffle play() synchronously inside the user click/key gesture handler
+      startRandomShufflePlaybackFromGate();
+
+      dismissEntranceGateUI();
+    }
+
+    function handleGateEnterWithoutMusic(e) {
+      if (e && typeof e.stopPropagation === 'function') {
+        e.stopPropagation();
+      }
+      if (!entranceGateReady || entranceGateDismissed) return;
+      entranceGateDismissed = true;
+      window.__oceanGateEntered = true;
+      window.__oceanAutoplayCompleted = true;
+      wantsToPlay = false;
+      previewMiniPlayerTrackInfo();
+      dismissEntranceGateUI();
+    }
+
+    function handleEntranceGateKeydown(e) {
+      if (!entranceGateReady || entranceGateDismissed) return;
+      if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        const muteBtn = document.getElementById('loading-screen-mute-enter');
+        if (muteBtn && document.activeElement === muteBtn) {
+          handleGateEnterWithoutMusic(e);
+        } else {
+          handleGateEnterWithMusic(e);
+        }
+      }
+    }
+
+    function markEntranceGateReady() {
+      if (entranceGateReady || entranceGateDismissed) return;
+      entranceGateReady = true;
+      if (gateFallbackTimer) {
+        clearTimeout(gateFallbackTimer);
+        gateFallbackTimer = null;
+      }
+      previewMiniPlayerTrackInfo();
+
+      const loader = document.getElementById('loading-screen');
+      const promptEl = document.getElementById('loading-screen-prompt');
+      const muteBtn = document.getElementById('loading-screen-mute-enter');
+
+      if (loader) {
+        loader.style.cursor = 'pointer';
+        loader.setAttribute('role', 'button');
+        loader.setAttribute('tabindex', '0');
+        loader.setAttribute('aria-label', 'Chạm để lặn xuống biển');
+        loader.addEventListener('click', handleGateEnterWithMusic);
+      }
+      if (muteBtn) {
+        muteBtn.addEventListener('click', handleGateEnterWithoutMusic);
+      }
+      window.addEventListener('keydown', handleEntranceGateKeydown);
+
+      if (promptEl) {
+        promptEl.style.opacity = '0';
+        setTimeout(() => {
+          if (entranceGateDismissed) return;
+          promptEl.textContent = 'chạm để lặn xuống biển';
+          promptEl.style.opacity = '1';
+        }, 180);
+      }
+      if (muteBtn) {
+        setTimeout(() => {
+          if (entranceGateDismissed) return;
+          muteBtn.style.visibility = 'visible';
+          muteBtn.style.pointerEvents = 'auto';
+          muteBtn.style.opacity = '0.62';
+        }, 180);
+      }
+    }
+
+    function checkEntranceGateDataReady() {
+      if (gateSongsLoaded && gateCharactersLoaded) {
+        markEntranceGateReady();
+      }
+    }
+
     function initRealtimeFirestoreListeners() {
-      if (!firestoreDb || !firestoreDocFns) return;
+      if (!firestoreDb || !firestoreDocFns) {
+        setTimeout(() => markEntranceGateReady(), 250);
+        return;
+      }
       const { collection, onSnapshot } = firestoreDocFns;
 
       // 1. Realtime listener: songs collection
@@ -5387,20 +5434,31 @@
                 renderAdminMusicList();
               }
               if (!audio.getAttribute('src') && remoteTracks.length > 0) {
-                const firstId = pickNextShuffleTrackId();
-                const firstIdx = remoteTracks.findIndex(t => t.id === firstId);
-                loadTrack(firstIdx !== -1 ? firstIdx : 0, { recordHistory: true });
+                if (wantsToPlay) {
+                  const firstId = pickNextShuffleTrackId();
+                  const firstIdx = remoteTracks.findIndex(t => t.id === firstId);
+                  loadTrack(firstIdx !== -1 ? firstIdx : 0, { recordHistory: true });
+                  playSingletonAudio({ isAutoplayAttempt: false });
+                } else {
+                  previewMiniPlayerTrackInfo();
+                }
               }
             }
+            gateSongsLoaded = true;
+            checkEntranceGateDataReady();
           },
           (err) => {
             handleFirestoreError(err, 'list', 'songs');
             firebaseInitFailed = true;
             updateOfflineBannerVisibility();
+            gateSongsLoaded = true;
+            checkEntranceGateDataReady();
           }
         );
       } catch (err) {
         console.warn('[Firebase] songs listener error:', err);
+        gateSongsLoaded = true;
+        checkEntranceGateDataReady();
       }
 
       // 2. Realtime listener: characters collection
@@ -5415,15 +5473,21 @@
             cloudCharactersList = snap.docs.map(d => d.data()).filter(c => c && c.id && c.name);
             hasReceivedCloudCharacters = true;
             mergeAndApplyCloudCharactersAndComments();
+            gateCharactersLoaded = true;
+            checkEntranceGateDataReady();
           },
           (err) => {
             handleFirestoreError(err, 'list', 'characters');
             firebaseInitFailed = true;
             updateOfflineBannerVisibility();
+            gateCharactersLoaded = true;
+            checkEntranceGateDataReady();
           }
         );
       } catch (err) {
         console.warn('[Firebase] characters listener error:', err);
+        gateCharactersLoaded = true;
+        checkEntranceGateDataReady();
       }
 
       // 3. Realtime listener: comments collection
@@ -7240,22 +7304,20 @@
     window.addEventListener('DOMContentLoaded', () => {
       initTheme();
       initMusicVolume();
-      initMusicAutoplayOnce();
+      previewMiniPlayerTrackInfo();
       updateFavoritesBadge();
       initDailyGacha();
       renderTagChips();
       renderCharacters();
       applySocialLinks();
       updateDefaultPassHintUI();
-      initRealtimeFirestoreListeners();
 
-      setTimeout(() => {
-        const loader = document.getElementById('loading-screen');
-        if (loader) {
-          loader.style.opacity = '0';
-          setTimeout(() => loader.remove(), 450);
-        }
-      }, 420);
+      // Requirement 5: 8-second fallback timer so entrance gate never gets stuck if Firebase is slow/offline
+      gateFallbackTimer = setTimeout(() => {
+        markEntranceGateReady();
+      }, 8000);
+
+      initRealtimeFirestoreListeners();
     });
 
     window.addEventListener('ocean_store_updated', () => {
