@@ -2674,7 +2674,7 @@
           </button>
 
           <div id="admin-nonadmin-warning" class="glass-panel" style="display:none; padding:12px 16px; border-radius:18px; border-color:rgba(212,91,122,0.45); font-size:12px; color:var(--ink); text-align:center; width:100%;">
-            <div style="color:var(--danger); font-weight:500; margin-bottom:4px;" id="admin-nonadmin-email-text">Tài khoản chưa có quyền Quản trị</div>
+            <div style="color:var(--danger); font-weight:500; margin-bottom:4px;" id="admin-nonadmin-status-text">Tài khoản chưa có quyền Quản trị</div>
             <div style="color:var(--ink-soft); font-size:11.5px; line-height:1.5;">Chỉ tài khoản Admin mới được phép thêm, sửa, xóa. Bạn vẫn có thể xem hồ sơ, nghe nhạc và bình luận bình thường.</div>
             <button type="button" class="btn-glass-pill" onclick="handleAdminLogout()" style="margin-top:10px; padding:5px 14px; font-size:11px;">Đổi tài khoản Google khác</button>
           </div>
@@ -2697,7 +2697,7 @@
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
               <span class="caption-micro">Admin Console</span>
               <span id="admin-cloud-status-badge" class="tag-pill" style="font-size:10px; padding:2px 9px; color:var(--success); border-color:var(--line);">Đã kết nối đám mây</span>
-              <span id="admin-logged-email-badge" class="caption-micro" style="text-transform:none; letter-spacing:0.02em; color:var(--accent);">quynhchinga1229@gmail.com</span>
+              <span id="admin-logged-status-badge" class="caption-micro" style="text-transform:none; letter-spacing:0.02em; color:var(--accent);">Admin · Đã đăng nhập</span>
             </div>
             <h2 class="font-serif-display" style="font-size:24px; color:var(--ink-strong); margin-top:2px;">Bảng Quản Trị Đại Dương</h2>
           </div>
@@ -3098,7 +3098,7 @@
       appId: "1:392962360412:web:840a0ef364f618571b1299"
     };
 
-    const ADMIN_EMAIL = "quynhchinga1229@gmail.com";
+    const ADMIN_UID = "mDMDrnFB7LNSJbVTkd9G7KMo2ao1";
     const FIRESTORE_DB_ID = firebaseAppletConfig?.firestoreDatabaseId || "(default)";
 
     const isFirebaseConfigured = Boolean(
@@ -3119,14 +3119,13 @@
       return Boolean(
         isFirebaseAdmin &&
         currentAuthUser &&
-        currentAuthUser.email &&
-        currentAuthUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()
+        currentAuthUser.uid === ADMIN_UID
       );
     }
 
     function requireAdminAuth() {
       if (isCurrentUserAdmin()) return true;
-      showToast(`Chỉ Admin (${ADMIN_EMAIL}) mới có quyền thêm, sửa, xóa dữ liệu`);
+      showToast("Chỉ Admin mới có quyền thêm, sửa, xóa dữ liệu");
       return false;
     }
 
@@ -3179,13 +3178,10 @@
         error: error instanceof Error ? error.message : String(error),
         authInfo: {
           userId: firebaseAuth?.currentUser?.uid,
-          email: firebaseAuth?.currentUser?.email,
-          emailVerified: firebaseAuth?.currentUser?.emailVerified,
           isAnonymous: firebaseAuth?.currentUser?.isAnonymous,
           tenantId: firebaseAuth?.currentUser?.tenantId,
           providerInfo: firebaseAuth?.currentUser?.providerData?.map(provider => ({
-            providerId: provider.providerId,
-            email: provider.email
+            providerId: provider.providerId
           })) || []
         },
         operationType,
@@ -5931,26 +5927,25 @@
     }
 
     /* ═══════════════════════════════════════════════════════════════════
-       6.18 ADMIN PANEL (GOOGLE AUTH FOR quynhchinga1229@gmail.com) & CRUD
+       6.18 ADMIN PANEL (GOOGLE AUTH UID CHECK) & CRUD
        ═══════════════════════════════════════════════════════════════════ */
     let hasAutoSyncedEmptyCloud = false;
 
     function updateDefaultPassHintUI() {
-      const emailBadge = document.getElementById('admin-logged-email-badge');
-      if (emailBadge) {
-        emailBadge.textContent = currentAuthUser?.email || ADMIN_EMAIL;
+      const statusBadge = document.getElementById('admin-logged-status-badge');
+      if (statusBadge) {
+        statusBadge.textContent = isCurrentUserAdmin() ? 'Admin · Đã đăng nhập' : 'Admin';
       }
     }
 
     if (firebaseAuth) {
       onAuthStateChanged(firebaseAuth, async (user) => {
-        currentAuthUser = user || null;
+        currentAuthUser = user ? { uid: user.uid } : null;
         const nonAdminWarn = document.getElementById('admin-nonadmin-warning');
-        const wrongEmailText = document.getElementById('admin-wrong-email-text');
         const errNote = document.getElementById('admin-auth-error-note');
         if (errNote) errNote.style.display = 'none';
 
-        if (user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+        if (user && user.uid === ADMIN_UID) {
           isFirebaseAdmin = true;
           sessionStorage.setItem('ocean_admin_logged', 'true');
           if (nonAdminWarn) nonAdminWarn.style.display = 'none';
@@ -5976,7 +5971,6 @@
         } else if (user) {
           isFirebaseAdmin = false;
           sessionStorage.removeItem('ocean_admin_logged');
-          if (wrongEmailText) wrongEmailText.textContent = user.email || 'Không xác định';
           if (nonAdminWarn) nonAdminWarn.style.display = 'block';
           const loginView = document.getElementById('admin-login-view');
           const dashView = document.getElementById('admin-dashboard-view');
@@ -6037,19 +6031,18 @@
         if (btn) btn.disabled = true;
         const result = await signInWithPopup(firebaseAuth, googleProvider);
         const user = result.user;
-        if (user && user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+        if (user && user.uid === ADMIN_UID) {
           isFirebaseAdmin = true;
-          currentAuthUser = user;
+          currentAuthUser = { uid: user.uid };
           sessionStorage.setItem('ocean_admin_logged', 'true');
           showAdminDashboard();
-          showToast(`Chào mừng Quản trị viên (${user.email})`);
+          showToast("Chào mừng Quản trị viên (Đã đăng nhập)");
         } else {
           isFirebaseAdmin = false;
           sessionStorage.removeItem('ocean_admin_logged');
-          showToast("Tài khoản Google này không phải email Quản trị viên. Bạn chỉ có quyền xem và bình luận.");
+          showToast("Tài khoản Google này không phải Quản trị viên. Bạn chỉ có quyền xem và bình luận.");
         }
       } catch (err) {
-        console.error('[Firebase Auth] Google Sign-In error:', err);
         const code = err?.code || '';
         let msg = "Không thể đăng nhập Google. Vui lòng thử lại.";
         if (code === 'auth/popup-blocked') {

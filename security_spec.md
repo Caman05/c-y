@@ -3,7 +3,7 @@
 ## 1. Data Invariants
 
 1. **Default-Deny Catch-All**: Every path not explicitly matched is denied for both `read` and `write`.
-2. **Admin Identity Invariant (`isAdmin`)**: Only an authenticated user with `request.auth != null`, `request.auth.token.email_verified == true`, and `request.auth.token.email == 'quynhchinga1229@gmail.com'` (or a verified document in `/admins/{uid}`) holds administrative privileges.
+2. **Admin Identity Invariant (`isAdmin`)**: Only an authenticated user with `request.auth != null` and `request.auth.uid == 'mDMDrnFB7LNSJbVTkd9G7KMo2ao1'` (or a verified document in `/admins/{uid}`) holds administrative privileges.
 3. **Song Invariant (`/songs/{songId}`)**:
    - Public visitors may read (`get`, `list` where `resource.data.id is string`).
    - Only `isAdmin()` may `create`, `update`, or `delete` songs, and every write must pass `isValidId(songId)` and `isValidSong(incoming())` with strict key whitelisting (`hasAll` / `hasOnly`).
@@ -27,8 +27,8 @@
 ## 2. The "Dirty Dozen" Payloads
 
 1. **Unauthenticated Song Creation**: Visitor attempts to `create` `/songs/m-hack` without admin auth.
-2. **Unverified Admin Email Spoof**: Attacker with `email: "quynhchinga1229@gmail.com"` but `email_verified: false` attempts to `create` a character.
-3. **Non-Admin Character Deletion**: Authenticated non-admin (`user@gmail.com`) attempts to `delete` `/characters/c-1`.
+2. **Non-Admin UID Spoof**: Attacker with `uid: "spoof-uid"` attempts to `create` a character.
+3. **Non-Admin Character Deletion**: Authenticated non-admin (`uid: "visitor-1"`) attempts to `delete` `/characters/c-1`.
 4. **Shadow Field Injection on Comment**: Visitor attempts to `create` `/comments/cm-1` with an extra field `"isAdmin": true`.
 5. **Orphaned Comment Creation**: Visitor attempts to `create` `/comments/cm-orphan` referencing a non-existent `characterId: "c-nonexistent"`.
 6. **Character Profile Hijack via Counter Update**: Visitor attempts to `update` `/characters/c-1` changing `chatLink` alongside `clickCount`.

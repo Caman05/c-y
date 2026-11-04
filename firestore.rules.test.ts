@@ -8,7 +8,7 @@ export interface TestCase {
   name: string;
   operation: 'get' | 'list' | 'create' | 'update' | 'delete';
   path: string;
-  auth: { uid: string; email?: string; email_verified?: boolean } | null;
+  auth: { uid: string } | null;
   payload?: Record<string, unknown>;
   expected: 'PERMISSION_DENIED' | 'ALLOWED';
 }
@@ -31,13 +31,11 @@ export const DIRTY_DOZEN_TESTS: TestCase[] = [
   },
   {
     id: 2,
-    name: 'Unverified Admin Email Spoof',
+    name: 'Non-Admin UID Spoof',
     operation: 'create',
     path: '/songs/m-spoof',
     auth: {
       uid: 'spoof-uid',
-      email: 'quynhchinga1229@gmail.com',
-      email_verified: false,
     },
     payload: {
       id: 'm-spoof',
@@ -55,8 +53,6 @@ export const DIRTY_DOZEN_TESTS: TestCase[] = [
     path: '/characters/c-1',
     auth: {
       uid: 'visitor-1',
-      email: 'visitor@gmail.com',
-      email_verified: true,
     },
     expected: 'PERMISSION_DENIED',
   },
@@ -120,9 +116,7 @@ export const DIRTY_DOZEN_TESTS: TestCase[] = [
     operation: 'create',
     path: '/characters/c-big',
     auth: {
-      uid: 'admin-uid',
-      email: 'quynhchinga1229@gmail.com',
-      email_verified: true,
+      uid: 'mDMDrnFB7LNSJbVTkd9G7KMo2ao1',
     },
     payload: {
       id: 'c-big',
@@ -176,8 +170,6 @@ export const DIRTY_DOZEN_TESTS: TestCase[] = [
     path: '/settings/donate',
     auth: {
       uid: 'user-2',
-      email: 'other@gmail.com',
-      email_verified: true,
     },
     payload: {
       id: 'donate',
@@ -192,9 +184,7 @@ export const DIRTY_DOZEN_TESTS: TestCase[] = [
     operation: 'create',
     path: '/characters/c-tags',
     auth: {
-      uid: 'admin-uid',
-      email: 'quynhchinga1229@gmail.com',
-      email_verified: true,
+      uid: 'mDMDrnFB7LNSJbVTkd9G7KMo2ao1',
     },
     payload: {
       id: 'c-tags',

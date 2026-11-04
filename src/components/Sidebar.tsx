@@ -32,7 +32,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [copiedContact, setCopiedContact] = useState(false);
 
   const handleCopyContact = () => {
-    navigator.clipboard.writeText('ocean.sanctuary.art@gmail.com');
+    navigator.clipboard.writeText('https://discord.com');
     setCopiedContact(true);
     setTimeout(() => setCopiedContact(false), 2000);
   };
@@ -204,7 +204,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </span>
           <div className="flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-white dark:bg-[#122238] border border-[#d2e6f7] dark:border-[#203959] text-xs shadow-sm">
             <span className="truncate max-w-[140px] text-[11px] text-slate-600 dark:text-slate-300 font-mono">
-              ocean.art@gmail.com
+              Biển Mộng Mơ
             </span>
             <button
               onClick={handleCopyContact}
