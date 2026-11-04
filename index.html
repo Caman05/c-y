@@ -2,7 +2,7 @@
 <html lang="vi" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>BIỂN MỘNG MƠ · Hồ Sơ Nhân Vật Đại Dương</title>
   <meta name="description" content="Không gian lưu trữ và khám phá hồ sơ nhân vật giữa đại dương mộng mơ.">
   <meta name="theme-color" content="#E3EFFC">
@@ -82,6 +82,7 @@
       --dune-4: rgba(235, 244, 255, 0.92);
       --danger: #D45B7A;
       --success: #489B8C;
+      --mobile-nav-height: 60px;
     }
 
     /* Dark Mode: "Biển Đêm Dịu" (Soft Bioluminescent Deep Sea, NOT Pitch Black) */
@@ -142,7 +143,7 @@
       color: var(--ink);
       background: linear-gradient(155deg, var(--bg-1) 0%, var(--bg-2) 52%, var(--lavender-haze) 100%);
       background-attachment: fixed;
-      min-height: 100vh;
+      min-height: 100dvh;
       overflow-x: hidden;
       transition: background 0.5s cubic-bezier(.22,1,.36,1), color 0.4s ease;
       position: relative;
@@ -276,7 +277,7 @@
       border: 1px solid var(--line);
       border-radius: 40px;
       box-shadow: inset 0 1px 28px rgba(255, 255, 255, 0.55), var(--shadow-soft);
-      min-height: calc(100vh - 48px);
+      min-height: calc(100dvh - 48px);
       display: grid;
       grid-template-columns: 68px 1fr;
       overflow: hidden;
@@ -1245,8 +1246,8 @@
     /* 1.12 FLOATING MUSIC ORB & GLASS MINI PLAYER */
     .music-floating-dock {
       position: fixed;
-      bottom: 28px;
-      right: 28px;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 90px);
+      right: 20px;
       z-index: 1200;
     }
 
@@ -1288,10 +1289,13 @@
 
     .music-glass-popover {
       display: none;
-      position: absolute;
-      bottom: 62px;
-      right: 0;
-      width: 290px;
+      position: fixed;
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 90px + 60px);
+      right: 20px;
+      width: min(290px, calc(100vw - 32px));
+      max-width: calc(100vw - 32px);
+      max-height: calc(100dvh - env(safe-area-inset-bottom, 0px) - 166px);
+      overflow-y: auto;
       padding: 18px 20px;
       border-radius: 26px;
       background: var(--glass-strong);
@@ -1300,6 +1304,7 @@
       border: 1px solid var(--line);
       box-shadow: var(--shadow-soft);
       animation: gentleFadeIn 0.28s cubic-bezier(.22,1,.36,1);
+      z-index: 1201;
     }
 
     /* 1.13 MODALS (2-Column Rednote Profile Modal + Nocturne Chat Bubbles) */
@@ -1896,35 +1901,53 @@
       .app-outer-wrapper {
         margin: 0;
         padding: 0;
+        transform: none;
+        filter: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        will-change: auto;
+        overflow: visible;
       }
       .device-frame {
         grid-template-columns: 1fr;
         border-radius: 0;
         border: none;
-        min-height: 100vh;
+        min-height: 100dvh;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        filter: none;
+        transform: none;
+        will-change: auto;
+        overflow: visible;
       }
-      /* Convert side rail into floating bottom dock on mobile */
+      /* Convert side rail into fixed horizontal bottom bar on mobile */
       .side-rail {
         position: fixed;
-        bottom: 14px;
-        left: 50%;
-        transform: translateX(-50%);
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        min-height: calc(var(--mobile-nav-height, 60px) + env(safe-area-inset-bottom, 0px));
+        transform: none;
         flex-direction: row;
-        padding: 6px 14px;
-        border-radius: 999px;
-        border: 1px solid var(--line);
+        align-items: center;
+        justify-content: space-evenly;
+        padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)) 16px;
+        border-radius: 24px 24px 0 0;
+        border-right: none;
+        border-top: 1px solid var(--line);
         background: var(--glass-strong);
-        backdrop-filter: blur(22px);
+        backdrop-filter: blur(22px) saturate(140%);
+        -webkit-backdrop-filter: blur(22px) saturate(140%);
         box-shadow: var(--shadow-soft);
         z-index: 1100;
-        gap: 10px;
+        gap: 0;
       }
       .rail-group {
-        flex-direction: row;
-        gap: 10px;
+        display: contents;
       }
       .main-stage {
-        padding: 18px 14px 100px 14px;
+        padding: 18px 14px calc(var(--mobile-nav-height, 60px) + env(safe-area-inset-bottom, 0px) + 16px) 14px;
         gap: 20px;
       }
       .hero-canvas {
@@ -1956,8 +1979,15 @@
         font-size: 11px;
       }
       .music-floating-dock {
-        bottom: 76px;
+        bottom: calc(var(--mobile-nav-height, 60px) + env(safe-area-inset-bottom, 0px) + 16px);
+        right: 20px;
+      }
+      .music-glass-popover {
+        bottom: calc(var(--mobile-nav-height, 60px) + env(safe-area-inset-bottom, 0px) + 16px + 60px);
         right: 16px;
+        width: min(290px, calc(100vw - 32px));
+        max-width: calc(100vw - 32px);
+        max-height: calc(100dvh - var(--mobile-nav-height, 60px) - env(safe-area-inset-bottom, 0px) - 92px);
       }
     }
 
@@ -2208,10 +2238,29 @@
             </div>
           </div>
 
-          <!-- 1px Wavy Divider: Hero -> Search & Filter -->
+          <!-- 1px Wavy Divider: Hero -> Top 3 Favorites -->
           <div class="wave-section-divider" aria-hidden="true">
             <svg viewBox="0 0 1200 14" preserveAspectRatio="none">
               <path d="M0,7 C100,1 200,13 300,7 C400,1 500,13 600,7 C700,1 800,13 900,7 C1000,1 1100,13 1200,7" vector-effect="non-scaling-stroke"/>
+            </svg>
+          </div>
+
+          <!-- TOP 3 FAVORITES GLASS CARD -->
+          <div class="glass-panel" style="padding: 20px 24px;">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--line-subtle);">
+              <h2 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; font-weight: 500; color: var(--ink-strong); display: flex; align-items: center; gap: 8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <span>Top 3 Được Yêu Thích</span>
+              </h2>
+              <span class="caption-micro">Lượt thả tim</span>
+            </div>
+            <div id="top-fav-list" class="ranking-list"></div>
+          </div>
+
+          <!-- 1px Wavy Divider: Top 3 Favorites -> Search & Filter -->
+          <div class="wave-section-divider" aria-hidden="true">
+            <svg viewBox="0 0 1200 14" preserveAspectRatio="none">
+              <path d="M0,7 C100,13 200,1 300,7 C400,13 500,1 600,7 C700,13 800,1 900,7 C1000,13 1100,1 1200,7" vector-effect="non-scaling-stroke"/>
             </svg>
           </div>
 
@@ -2263,26 +2312,7 @@
             </div>
           </div>
 
-          <!-- 1px Wavy Divider: Search & Filter -> Top 3 Favorites -->
-          <div class="wave-section-divider" aria-hidden="true">
-            <svg viewBox="0 0 1200 14" preserveAspectRatio="none">
-              <path d="M0,7 C100,13 200,1 300,7 C400,13 500,1 600,7 C700,13 800,1 900,7 C1000,13 1100,1 1200,7" vector-effect="non-scaling-stroke"/>
-            </svg>
-          </div>
-
-          <!-- TOP 3 FAVORITES GLASS CARD -->
-          <div class="glass-panel" style="padding: 20px 24px;">
-            <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--line-subtle);">
-              <h2 style="font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; font-weight: 500; color: var(--ink-strong); display: flex; align-items: center; gap: 8px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                <span>Top 3 Được Yêu Thích</span>
-              </h2>
-              <span class="caption-micro">Lượt thả tim</span>
-            </div>
-            <div id="top-fav-list" class="ranking-list"></div>
-          </div>
-
-          <!-- 1px Wavy Divider: Top 3 Favorites -> Character Gallery -->
+          <!-- 1px Wavy Divider: Search & Filter -> Character Gallery -->
           <div class="wave-section-divider" aria-hidden="true">
             <svg viewBox="0 0 1200 14" preserveAspectRatio="none">
               <path d="M0,7 C100,1 200,13 300,7 C400,1 500,13 600,7 C700,1 800,13 900,7 C1000,1 1100,13 1200,7" vector-effect="non-scaling-stroke"/>
@@ -4753,7 +4783,7 @@
         } catch {
           const win = window.open();
           if (win) {
-            win.document.write(`<body style="margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#F6FAFF;"><img src="${qrDataUrl}" style="max-width:90vw;max-height:90vh;border-radius:20px;background:#fff;padding:16px;"></body>`);
+            win.document.write(`<body style="margin:0;display:flex;align-items:center;justify-content:center;min-height:100dvh;background:#F6FAFF;"><img src="${qrDataUrl}" style="max-width:90vw;max-height:90vh;border-radius:20px;background:#fff;padding:16px;"></body>`);
           }
           showToast("Hãy nhấn giữ vào ảnh để lưu mã QR nhé!");
         }
