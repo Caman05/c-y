@@ -1,0 +1,318 @@
+{
+  "entities": {
+    "Song": {
+      "title": "Song",
+      "description": "An ocean background music track with audio streaming link.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Unique identifier for the song."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Song title."
+        },
+        "artist": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 150,
+          "description": "Performing artist name."
+        },
+        "url": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "description": "Audio URL (direct MP3, Google Drive, or Dropbox)."
+        },
+        "storage_url": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Optional direct storage URL."
+        },
+        "createdAt": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "ISO timestamp when the track was added."
+        }
+      },
+      "required": ["id", "title", "artist", "url", "createdAt"]
+    },
+    "Character": {
+      "title": "Character",
+      "description": "Ocean sanctuary character profile with portrait URL, links, riddle lock, and public counters.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Unique character ID."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 150,
+          "description": "Character display name."
+        },
+        "shortDescription": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Short summary shown on the character card."
+        },
+        "avatar": {
+          "type": "string",
+          "maxLength": 15000,
+          "description": "External image URL or compact SVG data URI."
+        },
+        "tags": {
+          "type": "array",
+          "description": "Bounded list of character tags (max 15)."
+        },
+        "intro": {
+          "type": "string",
+          "maxLength": 5000,
+          "description": "Character introduction prose."
+        },
+        "chatLink": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "External chat link URL."
+        },
+        "postLink": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "External post link URL."
+        },
+        "isPrivate": {
+          "type": "boolean",
+          "description": "Whether links are protected by a riddle password."
+        },
+        "question": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Riddle question for private character profiles."
+        },
+        "hint": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Hint for the riddle."
+        },
+        "passwordHash": {
+          "type": "string",
+          "maxLength": 128,
+          "description": "SHA-256 hash of the riddle answer."
+        },
+        "clickCount": {
+          "type": "number",
+          "description": "Global link click counter."
+        },
+        "favoriteCount": {
+          "type": "number",
+          "description": "Global favorite heart counter."
+        },
+        "createdAt": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "ISO creation timestamp."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "shortDescription",
+        "avatar",
+        "tags",
+        "intro",
+        "chatLink",
+        "postLink",
+        "isPrivate",
+        "question",
+        "hint",
+        "passwordHash",
+        "clickCount",
+        "favoriteCount",
+        "createdAt"
+      ]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "Public visitor comment on a character profile.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Unique comment ID."
+        },
+        "characterId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Referenced character document ID."
+        },
+        "authorName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "Display name of the commenter."
+        },
+        "content": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1500,
+          "description": "Comment body text."
+        },
+        "createdAt": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "ISO creation timestamp."
+        }
+      },
+      "required": ["id", "characterId", "authorName", "content", "createdAt"]
+    },
+    "Announcement": {
+      "title": "Announcement",
+      "description": "System announcement posted by the administrator.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Unique announcement ID."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Announcement title."
+        },
+        "content": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 3000,
+          "description": "Announcement content."
+        },
+        "createdAt": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "ISO creation timestamp."
+        }
+      },
+      "required": ["id", "title", "content", "createdAt"]
+    },
+    "AppSetting": {
+      "title": "AppSetting",
+      "description": "Shared application configuration document (donate, socials, tags).",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Setting key (donate, socials, tags)."
+        },
+        "qrImage": {
+          "type": "string",
+          "maxLength": 120000,
+          "description": "External QR image URL or compact compressed QR data URI."
+        },
+        "accountName": {
+          "type": "string",
+          "maxLength": 150,
+          "description": "Bank account holder name."
+        },
+        "bankName": {
+          "type": "string",
+          "maxLength": 150,
+          "description": "Bank or wallet name."
+        },
+        "accountNumber": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Bank account number."
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Thank-you note."
+        },
+        "fb": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Facebook link."
+        },
+        "discord": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Discord link."
+        },
+        "items": {
+          "type": "array",
+          "description": "Bounded array of tag strings (max 60)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "ISO update timestamp."
+        }
+      },
+      "required": ["id", "updatedAt"]
+    },
+    "FavoriteSync": {
+      "title": "FavoriteSync",
+      "description": "Cross-device favorite character IDs synced by 8-character sync code.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "8-character sync code."
+        },
+        "characterIds": {
+          "type": "array",
+          "description": "Bounded list of favorited character IDs (max 100)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "ISO update timestamp."
+        }
+      },
+      "required": ["id", "characterIds", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/songs/{songId}": {
+      "schema": { "$ref": "#/entities/Song" },
+      "description": "Ocean music playlist tracks."
+    },
+    "/characters/{characterId}": {
+      "schema": { "$ref": "#/entities/Character" },
+      "description": "Ocean character profiles and global favorite/click counts."
+    },
+    "/comments/{commentId}": {
+      "schema": { "$ref": "#/entities/Comment" },
+      "description": "Visitor comments on character profiles."
+    },
+    "/announcements/{announcementId}": {
+      "schema": { "$ref": "#/entities/Announcement" },
+      "description": "System announcements."
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/AppSetting" },
+      "description": "Global settings (donate, socials, tags)."
+    },
+    "/favorites/{syncCode}": {
+      "schema": { "$ref": "#/entities/FavoriteSync" },
+      "description": "Cross-device favorite character lists indexed by sync code."
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Ocean Characters - Biển Mộng Mơ",
+  "description": "Nền tảng khám phá hồ sơ nhân vật với phong cách biển cả xinh xắn, phát nhạc thư giãn, diễn đàn tương tác và hệ thống quản trị phong phú.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

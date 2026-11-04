@@ -1,0 +1,195 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Pillar 1: Global Default-Deny Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Core Primitives
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Admin Identity Check: Bootstrapped Admin Email (quynhchinga1229@gmail.com) with verified email OR admins collection lookup
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email == 'quynhchinga1229@gmail.com' && request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Validation Blueprint: Song (/songs/{songId})
+    function isValidSong(data) {
+      return data.keys().hasAll(['id', 'title', 'artist', 'url', 'createdAt']) &&
+        data.keys().hasOnly(['id', 'title', 'artist', 'url', 'storage_url', 'createdAt']) &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+        data.artist is string && data.artist.size() >= 1 && data.artist.size() <= 150 &&
+        data.url is string && data.url.size() >= 1 && data.url.size() <= 2000 &&
+        (!('storage_url' in data) || (data.storage_url is string && data.storage_url.size() <= 2000)) &&
+        data.createdAt is string && data.createdAt.size() >= 1 && data.createdAt.size() <= 64;
+    }
+
+    // Validation Blueprint: Character (/characters/{characterId})
+    function isValidCharacter(data) {
+      return data.keys().hasAll([
+          'id', 'name', 'shortDescription', 'avatar', 'tags', 'intro',
+          'chatLink', 'postLink', 'isPrivate', 'question', 'hint',
+          'passwordHash', 'clickCount', 'favoriteCount', 'createdAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'name', 'shortDescription', 'avatar', 'tags', 'intro',
+          'chatLink', 'postLink', 'isPrivate', 'question', 'hint',
+          'passwordHash', 'clickCount', 'favoriteCount', 'createdAt'
+        ]) &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 150 &&
+        data.shortDescription is string && data.shortDescription.size() <= 500 &&
+        data.avatar is string && data.avatar.size() <= 15000 &&
+        data.tags is list && data.tags.size() <= 15 && (data.tags.size() == 0 || (data.tags[0] is string && data.tags[0].size() <= 60)) &&
+        data.intro is string && data.intro.size() <= 5000 &&
+        data.chatLink is string && data.chatLink.size() <= 2000 &&
+        data.postLink is string && data.postLink.size() <= 2000 &&
+        data.isPrivate is bool &&
+        data.question is string && data.question.size() <= 500 &&
+        data.hint is string && data.hint.size() <= 500 &&
+        data.passwordHash is string && data.passwordHash.size() <= 128 &&
+        data.clickCount is number && data.clickCount >= 0 &&
+        data.favoriteCount is number && data.favoriteCount >= 0 &&
+        data.createdAt is string && data.createdAt.size() >= 1 && data.createdAt.size() <= 64;
+    }
+
+    // Validation Blueprint: Comment (/comments/{commentId})
+    function isValidComment(data) {
+      return data.keys().hasAll(['id', 'characterId', 'authorName', 'content', 'createdAt']) &&
+        data.keys().hasOnly(['id', 'characterId', 'authorName', 'content', 'createdAt']) &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.characterId is string && data.characterId.size() >= 1 && data.characterId.size() <= 128 && data.characterId.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.authorName is string && data.authorName.size() >= 1 && data.authorName.size() <= 100 &&
+        data.content is string && data.content.size() >= 1 && data.content.size() <= 1500 &&
+        data.createdAt is string && data.createdAt.size() >= 1 && data.createdAt.size() <= 64;
+    }
+
+    // Validation Blueprint: Announcement (/announcements/{announcementId})
+    function isValidAnnouncement(data) {
+      return data.keys().hasAll(['id', 'title', 'content', 'createdAt']) &&
+        data.keys().hasOnly(['id', 'title', 'content', 'createdAt']) &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+        data.content is string && data.content.size() >= 1 && data.content.size() <= 3000 &&
+        data.createdAt is string && data.createdAt.size() >= 1 && data.createdAt.size() <= 64;
+    }
+
+    // Validation Blueprint: AppSetting (/settings/{settingId})
+    function isValidAppSetting(data) {
+      return data.keys().hasAll(['id', 'updatedAt']) &&
+        data.keys().hasOnly([
+          'id', 'qrImage', 'accountName', 'bankName', 'accountNumber',
+          'message', 'fb', 'discord', 'items', 'updatedAt'
+        ]) &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        (!('qrImage' in data) || (data.qrImage is string && data.qrImage.size() <= 120000)) &&
+        (!('accountName' in data) || (data.accountName is string && data.accountName.size() <= 150)) &&
+        (!('bankName' in data) || (data.bankName is string && data.bankName.size() <= 150)) &&
+        (!('accountNumber' in data) || (data.accountNumber is string && data.accountNumber.size() <= 100)) &&
+        (!('message' in data) || (data.message is string && data.message.size() <= 500)) &&
+        (!('fb' in data) || (data.fb is string && data.fb.size() <= 1000)) &&
+        (!('discord' in data) || (data.discord is string && data.discord.size() <= 1000)) &&
+        (!('items' in data) || (data.items is list && data.items.size() <= 60 && (data.items.size() == 0 || (data.items[0] is string && data.items[0].size() <= 60)))) &&
+        data.updatedAt is string && data.updatedAt.size() >= 1 && data.updatedAt.size() <= 64;
+    }
+
+    // Validation Blueprint: FavoriteSync (/favorites/{syncCode})
+    function isValidFavoriteSync(data) {
+      return data.keys().hasAll(['id', 'characterIds', 'updatedAt']) &&
+        data.keys().hasOnly(['id', 'characterIds', 'updatedAt']) &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 32 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.characterIds is list && data.characterIds.size() <= 100 && (data.characterIds.size() == 0 || (data.characterIds[0] is string && data.characterIds[0].size() <= 128)) &&
+        data.updatedAt is string && data.updatedAt.size() >= 1 && data.updatedAt.size() <= 64;
+    }
+
+    // Collection 1: Songs (/songs/{songId})
+    match /songs/{songId} {
+      allow get: if isValidId(songId);
+      allow list: if true;
+      allow create: if isAdmin() && isValidId(songId) && isValidSong(incoming()) && incoming().id == songId;
+      allow update: if isValidSong(incoming()) && isAdmin() && isValidId(songId) && incoming().id == existing().id && incoming().createdAt == existing().createdAt;
+      allow delete: if isAdmin() && isValidId(songId);
+    }
+
+    // Collection 2: Characters (/characters/{characterId})
+    match /characters/{characterId} {
+      allow get: if isValidId(characterId);
+      allow list: if true;
+      allow create: if isAdmin() && isValidId(characterId) && isValidCharacter(incoming()) && incoming().id == characterId;
+      allow update: if isValidCharacter(incoming()) && isValidId(characterId) && incoming().id == existing().id && incoming().createdAt == existing().createdAt && (
+        isAdmin() ||
+        // Action 1: Public link click counter increment (+1)
+        (
+          incoming().diff(existing()).affectedKeys().hasOnly(['clickCount']) &&
+          incoming().clickCount == existing().clickCount + 1
+        ) ||
+        // Action 2: Public favorite heart toggle (+1 or -1)
+        (
+          incoming().diff(existing()).affectedKeys().hasOnly(['favoriteCount']) &&
+          (incoming().favoriteCount == existing().favoriteCount + 1 || incoming().favoriteCount == existing().favoriteCount - 1)
+        )
+      );
+      allow delete: if isAdmin() && isValidId(characterId);
+    }
+
+    // Collection 3: Comments (/comments/{commentId})
+    match /comments/{commentId} {
+      allow get: if isValidId(commentId);
+      allow list: if true;
+      // Visitors and Admin can create comments if schema and IDs are valid
+      allow create: if isValidId(commentId) &&
+        isValidComment(incoming()) &&
+        incoming().id == commentId;
+      allow update: if false;
+      allow delete: if isAdmin() && isValidId(commentId);
+    }
+
+    // Collection 4: Announcements (/announcements/{announcementId})
+    match /announcements/{announcementId} {
+      allow get: if isValidId(announcementId);
+      allow list: if true;
+      allow create: if isAdmin() && isValidId(announcementId) && isValidAnnouncement(incoming()) && incoming().id == announcementId;
+      allow update: if isValidAnnouncement(incoming()) && isAdmin() && isValidId(announcementId) && incoming().id == existing().id && incoming().createdAt == existing().createdAt;
+      allow delete: if isAdmin() && isValidId(announcementId);
+    }
+
+    // Collection 5: Settings (/settings/{settingId})
+    match /settings/{settingId} {
+      allow get: if isValidId(settingId);
+      allow list: if true;
+      allow create: if isAdmin() && isValidId(settingId) && isValidAppSetting(incoming()) && incoming().id == settingId;
+      allow update: if isValidAppSetting(incoming()) && isAdmin() && isValidId(settingId) && incoming().id == existing().id;
+      allow delete: if isAdmin() && isValidId(settingId);
+    }
+
+    // Collection 6: Cross-Device Favorites (/favorites/{syncCode})
+    match /favorites/{syncCode} {
+      allow get: if isValidId(syncCode);
+      allow list: if false;
+      allow create: if isValidId(syncCode) && isValidFavoriteSync(incoming()) && incoming().id == syncCode;
+      allow update: if isValidFavoriteSync(incoming()) && isValidId(syncCode) && incoming().id == existing().id && incoming().diff(existing()).affectedKeys().hasOnly(['characterIds', 'updatedAt']);
+      allow delete: if isAdmin() && isValidId(syncCode);
+    }
+  }
+}

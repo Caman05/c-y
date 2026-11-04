@@ -1,0 +1,229 @@
+{
+  "adminPassword": "oceanadmin",
+  "visitCount": 143,
+  "tags": [
+    "Biển Sâu",
+    "Mỹ Nhân Ngư",
+    "Thần Thoại",
+    "Dễ Thương",
+    "Hoàng Tử",
+    "Kỳ Ảo",
+    "Yandere",
+    "Tsundere",
+    "Trầm Lặng",
+    "Bảo Hộ",
+    "Học Đường"
+  ],
+  "announcements": [
+    {
+      "id": "ann-1",
+      "title": "Chào mừng đến với Hải Trình Biển Mộng Mơ!",
+      "content": "Hãy bật âm lượng để lắng nghe giai điệu sóng biển thư giãn và khám phá những người bạn kỳ diệu nơi đáy đại dương nhé!",
+      "type": "info",
+      "active": true,
+      "createdAt": "2026-11-03T10:07:11.187Z"
+    },
+    {
+      "id": "ann-2",
+      "title": "Ra mắt tính năng Thẻ Riêng Tư & Giải Pass",
+      "content": "Một số nhân vật bí mật có câu đố thú vị đang chờ bạn khám phá link trò chuyện đấy!",
+      "type": "event",
+      "active": true,
+      "createdAt": "2026-11-02T10:07:11.187Z"
+    }
+  ],
+  "musicTracks": [
+    {
+      "id": "track-1",
+      "title": "Ocean Breeze & Seagulls Lofi",
+      "artist": "Aura of Sea",
+      "url": "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3",
+      "duration": "02:27"
+    },
+    {
+      "id": "track-2",
+      "title": "Deep Sea Melodies - Gentle Wave",
+      "artist": "Calm Tides",
+      "url": "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=ambient-piano-amp-strings-10711.mp3",
+      "duration": "03:15"
+    },
+    {
+      "id": "track-3",
+      "title": "Mermaid Fantasy Song",
+      "artist": "Ocean Whisper",
+      "url": "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=relaxing-music-part-11-140682.mp3",
+      "duration": "02:40"
+    }
+  ],
+  "characters": [
+    {
+      "id": "char-1",
+      "name": "Marina Coralynn",
+      "shortDescription": "Công chúa tiên cá út của rạn san hô Lam Ngọc, tò mò về thế giới mặt nước.",
+      "avatar": "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80",
+      "tags": [
+        "Mỹ Nhân Ngư",
+        "Dễ Thương",
+        "Kỳ Ảo"
+      ],
+      "detailDescription": "Marina có đôi mắt lấp lánh như ngọc lục bảo và chiếc đuôi vảy ánh xà cừ chuyển màu theo ánh trăng. Nàng rất thích nhặt những mảnh vỏ ốc lấp lánh và sưu tầm những chiếc thìa từ tàu đắm.",
+      "backstory": "Sinh ra trong hoàng gia san hô sâu dưới đáy biển Azure, Marina luôn nghe lời dặn dò không được bơi lên mặt nước. Nhưng vào một đêm trăng tròn tĩnh lặng, một giai điệu lạ từ bến cảng trôi đến đã làm thức tỉnh lòng tò mò không thể kìm nén của nàng...",
+      "firstMessage": "Suỵt... bạn đừng nói to nhé, vệ binh rùa biển của mình đang tuần tra gần đây đấy! Bạn... có phải là người từ trên bờ biển kia không?",
+      "linkUrl": "https://c.ai",
+      "linkButtonLabel": "Tâm tình cùng Marina 🫧",
+      "isPrivate": false,
+      "hint": "",
+      "question": "",
+      "password": "",
+      "clickCount": 189,
+      "favoriteCount": 78,
+      "createdAt": "2026-11-01T10:07:11.188Z",
+      "feedbacks": [
+        {
+          "id": "fb-1",
+          "authorName": "Bé Sò Nhỏ",
+          "content": "Marina cưng xỉu luôn á! First message ngọt ngào mộng mơ quá trời!",
+          "createdAt": "2026-11-02T10:07:11.188Z"
+        },
+        {
+          "id": "fb-2",
+          "authorName": "Hải Âu Lang Thang",
+          "content": "Bot tương tác siêu có chiều sâu, tạo hình biển xanh xuất sắc ghê.",
+          "createdAt": "2026-11-03T10:07:11.188Z"
+        }
+      ]
+    },
+    {
+      "id": "char-2",
+      "name": "Kaelen Leviathan",
+      "shortDescription": "Hộ vệ rồng biển vực thẳm - Trầm lặng, lạnh lùng nhưng hết mực trung thành.",
+      "avatar": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80",
+      "tags": [
+        "Biển Sâu",
+        "Trầm Lặng",
+        "Bảo Hộ",
+        "Thần Thoại"
+      ],
+      "detailDescription": "Người canh giữ Khe Nứt Vô Tận. Thân mang giáp vảy rồng đen ánh xanh lam thẫm, Kaelen không thích ồn ào và luôn cảnh giác trước bất kỳ ai tiến lại vùng nước cấm.",
+      "backstory": "Kaelen từng là chiến binh kiêu hãnh của vương triều biển cổ xưa. Sau cuộc phong ấn thủy quái nghìn năm, anh chọn ở lại nơi tối tăm nhất của đáy biển để đảm bảo hòa bình vĩnh cửu.",
+      "firstMessage": "Dừng bước. Nơi này là vực sâu nghìn tầm, không phải chỗ để những sinh linh mỏng manh như ngươi dạo chơi.",
+      "linkUrl": "https://c.ai",
+      "linkButtonLabel": "Đối mặt Kaelen ⚔️",
+      "isPrivate": true,
+      "hint": "Màu sắc chủ đạo của vảy rồng bảo hộ nơi vực thẳm",
+      "question": "Vảy của Kaelen có ánh sắc màu gì? (Gợi ý: xanh lam)",
+      "password": "xanh lam",
+      "clickCount": 245,
+      "favoriteCount": 92,
+      "createdAt": "2026-10-30T10:07:11.188Z",
+      "feedbacks": [
+        {
+          "id": "fb-3",
+          "authorName": "Bọt Biển Cute",
+          "content": "Gu tui gu tui, ngoài lạnh trong nóng xỉu ngang! Giải đố hint dễ thương quá nè.",
+          "createdAt": "2026-11-03T10:07:11.188Z"
+        }
+      ]
+    },
+    {
+      "id": "char-3",
+      "name": "Lumiere Sứa Nhỏ",
+      "shortDescription": "Tinh linh sứa phát quang ngây thơ, thích trôi theo dòng hải lưu ấm áp.",
+      "avatar": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=600&q=80",
+      "tags": [
+        "Dễ Thương",
+        "Kỳ Ảo",
+        "Biển Sâu"
+      ],
+      "detailDescription": "Lumiere nhỏ bé, thân trong suốt tỏa ra ánh sáng hồng lam dịu dàng. Mỗi khi vui vẻ, xung quanh em sẽ tạo ra vô số bóng nước phát sáng rực rỡ.",
+      "backstory": "Sinh ra từ giọt nước mắt hạnh phúc của Nữ Thần Biển Cả, Lumiere không có ký ức về thù hận, chỉ luôn mong muốn đem ánh sáng ấm áp sưởi ấm những sinh vật lạc lối dưới vực tối.",
+      "firstMessage": "Pikoo~ Nhìn này, bong bóng của mình có thể đổi màu đấy! Cậu chạm vào một cái thử xem, không bị chích đâu nha~",
+      "linkUrl": "https://c.ai",
+      "linkButtonLabel": "Chơi cùng Lumiere ✨",
+      "isPrivate": false,
+      "hint": "",
+      "question": "",
+      "password": "",
+      "clickCount": 312,
+      "favoriteCount": 115,
+      "createdAt": "2026-11-02T10:07:11.188Z",
+      "feedbacks": [
+        {
+          "id": "fb-4",
+          "authorName": "Cá Heo Mộng Mơ",
+          "content": "Em bé này chữa lành tâm hồn thực sự, nhìn thôi là đã thấy bình yên rồi!",
+          "createdAt": "2026-11-03T10:07:11.188Z"
+        }
+      ]
+    },
+    {
+      "id": "char-4",
+      "name": "Zephyr Hải Vân",
+      "shortDescription": "Thuyền trưởng con tàu ma Hải Tặc Mây Trôi, lang thang giữa biển và bầu trời.",
+      "avatar": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+      "tags": [
+        "Thần Thoại",
+        "Tsundere",
+        "Kỳ Ảo"
+      ],
+      "detailDescription": "Một chàng trai trẻ với chiếc áo choàng màu gió biển và chiếc la bàn luôn chỉ về phương người có ước mơ chân thật nhất.",
+      "backstory": "Zephyr bị trúng lời nguyền không thể già đi khi dám trộm tấm hải đồ của thần bão tố. Chàng đi thuyền trên mây và chỉ thả neo khi gặp người thú vị.",
+      "firstMessage": "Hừm, lại một kẻ lạ mặt nữa mò lên boong tàu của ta à? Đưa chiếc vỏ ốc đẹp nhất của ngươi ra làm lệ phí lên tàu đi đã.",
+      "linkUrl": "",
+      "linkButtonLabel": "Lên tàu cùng Zephyr ⚓",
+      "isPrivate": false,
+      "hint": "",
+      "question": "",
+      "password": "",
+      "clickCount": 95,
+      "favoriteCount": 41,
+      "createdAt": "2026-10-31T10:07:11.188Z",
+      "feedbacks": []
+    }
+  ],
+  "forumPosts": [
+    {
+      "id": "post-1",
+      "authorName": "Admin Đại Dương 🐋",
+      "authorRole": "admin",
+      "title": "Chào mừng các bạn đến với Diễn đàn Đại Dương!",
+      "content": "Nơi này để chúng mình cùng giao lưu, chia sẻ plot ý tưởng, trao đổi về các nhân vật bot yêu thích hoặc yêu cầu admin tạo thêm nhân vật mới nha! Chúc mọi người có những phút giây thư giãn tuyệt vời bên tiếng sóng biển.",
+      "tag": "Thông Báo",
+      "createdAt": "2026-11-01T10:07:11.188Z",
+      "likes": 34,
+      "comments": [
+        {
+          "id": "c-1",
+          "authorName": "Bé Sò Nhỏ",
+          "content": "Web đẹp xỉu luôn admin ơi, vibe biển ngắm hoài không chán!",
+          "createdAt": "2026-11-02T14:07:11.188Z"
+        },
+        {
+          "id": "c-2",
+          "authorName": "Thủy Cung Lữ Khách",
+          "content": "Mong admin thêm nhiều bot yandere biển sâu bí ẩn nữa nhé!",
+          "createdAt": "2026-11-03T00:07:11.188Z"
+        }
+      ]
+    },
+    {
+      "id": "post-2",
+      "authorName": "Ngôi Sao Biển",
+      "authorRole": "user",
+      "title": "Có ai giải được pass của Kaelen chưa ạ?",
+      "content": "Gợi ý câu đố dễ thương quá trời! Mình nhập cái là ra ngay link tâm sự liền, ổng ngầu đét luôn mng ơi!!",
+      "tag": "Chia Sẻ",
+      "createdAt": "2026-11-02T19:07:11.188Z",
+      "likes": 19,
+      "comments": [
+        {
+          "id": "c-3",
+          "authorName": "Cá Voi Lưng Gù",
+          "content": "Đúng rùi haha, đọc hint là biết liền xanh lam siêu dễ thương!",
+          "createdAt": "2026-11-03T02:07:11.188Z"
+        }
+      ]
+    }
+  ],
+  "favoritesByIp": {}
+}
