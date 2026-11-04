@@ -2022,7 +2022,6 @@
       <circle cx="32" cy="12" r="2" stroke="var(--accent-2)"/>
     </svg>
     <p id="loading-screen-prompt" class="subtitle-italic" style="margin-top:14px; font-size:17px; transition:opacity 0.35s ease; user-select:none;">đang lặn xuống biển…</p>
-    <button id="loading-screen-mute-enter" type="button" class="subtitle-italic" style="margin-top:12px; background:none; border:none; padding:6px 14px; font-size:13px; color:var(--ink-soft); opacity:0; visibility:hidden; pointer-events:none; cursor:pointer; transition:opacity 0.35s ease; user-select:none;">vào không nhạc</button>
   </div>
 
   <!-- Toast Container -->
@@ -5301,7 +5300,6 @@
 
     function dismissEntranceGateUI() {
       const loader = document.getElementById('loading-screen');
-      const muteBtn = document.getElementById('loading-screen-mute-enter');
       window.removeEventListener('keydown', handleEntranceGateKeydown);
       if (loader) {
         loader.removeEventListener('click', handleGateEnterWithMusic);
@@ -5311,17 +5309,10 @@
           if (loader.parentNode) loader.remove();
         }, 550);
       }
-      if (muteBtn) {
-        muteBtn.removeEventListener('click', handleGateEnterWithoutMusic);
-      }
     }
 
-    function handleGateEnterWithMusic(e) {
+    function handleGateEnterWithMusic() {
       if (!entranceGateReady || entranceGateDismissed) return;
-      const muteBtn = document.getElementById('loading-screen-mute-enter');
-      if (e && muteBtn && (e.target === muteBtn || muteBtn.contains(e.target))) {
-        return;
-      }
       entranceGateDismissed = true;
       window.__oceanGateEntered = true;
 
@@ -5331,29 +5322,11 @@
       dismissEntranceGateUI();
     }
 
-    function handleGateEnterWithoutMusic(e) {
-      if (e && typeof e.stopPropagation === 'function') {
-        e.stopPropagation();
-      }
-      if (!entranceGateReady || entranceGateDismissed) return;
-      entranceGateDismissed = true;
-      window.__oceanGateEntered = true;
-      window.__oceanAutoplayCompleted = true;
-      wantsToPlay = false;
-      previewMiniPlayerTrackInfo();
-      dismissEntranceGateUI();
-    }
-
     function handleEntranceGateKeydown(e) {
       if (!entranceGateReady || entranceGateDismissed) return;
       if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') {
         e.preventDefault();
-        const muteBtn = document.getElementById('loading-screen-mute-enter');
-        if (muteBtn && document.activeElement === muteBtn) {
-          handleGateEnterWithoutMusic(e);
-        } else {
-          handleGateEnterWithMusic(e);
-        }
+        handleGateEnterWithMusic();
       }
     }
 
@@ -5368,7 +5341,6 @@
 
       const loader = document.getElementById('loading-screen');
       const promptEl = document.getElementById('loading-screen-prompt');
-      const muteBtn = document.getElementById('loading-screen-mute-enter');
 
       if (loader) {
         loader.style.cursor = 'pointer';
@@ -5376,9 +5348,6 @@
         loader.setAttribute('tabindex', '0');
         loader.setAttribute('aria-label', 'Chạm để lặn xuống biển');
         loader.addEventListener('click', handleGateEnterWithMusic);
-      }
-      if (muteBtn) {
-        muteBtn.addEventListener('click', handleGateEnterWithoutMusic);
       }
       window.addEventListener('keydown', handleEntranceGateKeydown);
 
@@ -5388,14 +5357,6 @@
           if (entranceGateDismissed) return;
           promptEl.textContent = 'chạm để lặn xuống biển';
           promptEl.style.opacity = '1';
-        }, 180);
-      }
-      if (muteBtn) {
-        setTimeout(() => {
-          if (entranceGateDismissed) return;
-          muteBtn.style.visibility = 'visible';
-          muteBtn.style.pointerEvents = 'auto';
-          muteBtn.style.opacity = '0.62';
         }, 180);
       }
     }
