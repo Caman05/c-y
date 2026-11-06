@@ -2014,7 +2014,7 @@
   </div>
 
   <!-- Loading Screen / Entrance Gate: Delicate Line-Art Fish + Italic Subtitle -->
-  <div id="loading-screen" style="position:fixed; inset:0; width:100%; height:100dvh; min-height:100dvh; z-index:9000; background:var(--bg-1); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; text-align:center; transition:opacity 0.55s ease;">
+  <div id="loading-screen" style="position:fixed; inset:0; width:100%; height:100dvh; min-height:100dvh; z-index:9000; background:var(--bg-1); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; text-align:center; transition:opacity 0.55s ease; cursor:pointer; touch-action:manipulation;">
     <svg width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="var(--accent)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="animation: gentleSpin 8s linear infinite;">
       <path d="M46 24C40 16 26 16 18 26C12 33 14 44 22 48C30 52 42 48 48 38" />
       <path d="M46 24C52 22 56 16 56 16C54 24 56 30 56 30C52 28 46 24 46 24Z" fill="var(--accent-soft-bg)"/>
@@ -2023,6 +2023,45 @@
     </svg>
     <p id="loading-screen-prompt" class="subtitle-italic" style="margin-top:14px; font-size:17px; transition:opacity 0.35s ease; user-select:none;">đang lặn xuống biển…</p>
   </div>
+
+  <!-- iOS / Mobile WebKit Safety Guard for Entrance Gate -->
+  <script>
+    (function() {
+      var loader = document.getElementById('loading-screen');
+      if (loader) {
+        var triggerGate = function() {
+          if (typeof window.__oceanHandleGateEnter === 'function') {
+            window.__oceanHandleGateEnter();
+          }
+        };
+        loader.addEventListener('click', triggerGate);
+        loader.addEventListener('touchend', triggerGate, { passive: true });
+      }
+
+      var safetyTimer = setTimeout(function() {
+        if (typeof window.__oceanMarkGateReady === 'function') {
+          window.__oceanMarkGateReady();
+        } else {
+          var promptEl = document.getElementById('loading-screen-prompt');
+          var l = document.getElementById('loading-screen');
+          if (promptEl && promptEl.textContent && promptEl.textContent.indexOf('đang lặn') !== -1) {
+            promptEl.style.opacity = '0';
+            setTimeout(function() {
+              promptEl.textContent = 'chạm để lặn xuống biển';
+              promptEl.style.opacity = '1';
+            }, 180);
+            if (l) {
+              l.style.cursor = 'pointer';
+              l.setAttribute('role', 'button');
+              l.setAttribute('tabindex', '0');
+              l.setAttribute('aria-label', 'Chạm để lặn xuống biển');
+            }
+          }
+        }
+      }, 7000);
+      window.__oceanEntranceGateSafetyTimer = safetyTimer;
+    })();
+  </script>
 
   <!-- Toast Container -->
   <div id="toast-container" class="toast-stack"></div>
@@ -3546,9 +3585,9 @@
     }
 
     const DEFAULT_ADMIN_PASSWORD = 'oceanadmin';
-    const DEFAULT_ADMIN_HASH = await sha256(DEFAULT_ADMIN_PASSWORD);
-    const KAELEN_HASH = await sha256('xanh lam');
-    const CORINA_HASH = await sha256('đào');
+    const DEFAULT_ADMIN_HASH = "e9b847821e3e5182a73953a7f1d9b50e5f915a8ed05ae7f2cc1f3a12501606a4";
+    const KAELEN_HASH = "05eea176393305dabdaf481a0faeb3dd19d3f1ec913199e94b352e6822bfe0f8";
+    const CORINA_HASH = "32dab8457e8a498a2223e71c1c4d72559f0ad515c8c3219cec3b15e4fba21c90";
     SEED_DATA.adminHash = DEFAULT_ADMIN_HASH;
     SEED_DATA.characters[1].passwordHash = KAELEN_HASH;
     SEED_DATA.characters[5].passwordHash = CORINA_HASH;
@@ -5388,6 +5427,7 @@
       window.removeEventListener('keydown', handleEntranceGateKeydown);
       if (loader) {
         loader.removeEventListener('click', handleGateEnterWithMusic);
+        loader.removeEventListener('touchend', handleGateEnterWithMusic);
         loader.style.pointerEvents = 'none';
         loader.style.opacity = '0';
         setTimeout(() => {
@@ -5396,7 +5436,10 @@
       }
     }
 
-    function handleGateEnterWithMusic() {
+    function handleGateEnterWithMusic(e) {
+      if (e && typeof e.stopPropagation === 'function') {
+        e.stopPropagation();
+      }
       if (!entranceGateReady || entranceGateDismissed) return;
       entranceGateDismissed = true;
       window.__oceanGateEntered = true;
@@ -5406,12 +5449,13 @@
 
       dismissEntranceGateUI();
     }
+    window.__oceanHandleGateEnter = handleGateEnterWithMusic;
 
     function handleEntranceGateKeydown(e) {
       if (!entranceGateReady || entranceGateDismissed) return;
       if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') {
         e.preventDefault();
-        handleGateEnterWithMusic();
+        handleGateEnterWithMusic(e);
       }
     }
 
@@ -5421,6 +5465,10 @@
       if (gateFallbackTimer) {
         clearTimeout(gateFallbackTimer);
         gateFallbackTimer = null;
+      }
+      if (window.__oceanEntranceGateSafetyTimer) {
+        clearTimeout(window.__oceanEntranceGateSafetyTimer);
+        window.__oceanEntranceGateSafetyTimer = null;
       }
       previewMiniPlayerTrackInfo();
 
@@ -5433,6 +5481,7 @@
         loader.setAttribute('tabindex', '0');
         loader.setAttribute('aria-label', 'Chạm để lặn xuống biển');
         loader.addEventListener('click', handleGateEnterWithMusic);
+        loader.addEventListener('touchend', handleGateEnterWithMusic, { passive: true });
       }
       window.addEventListener('keydown', handleEntranceGateKeydown);
 
@@ -5445,6 +5494,7 @@
         }, 180);
       }
     }
+    window.__oceanMarkGateReady = markEntranceGateReady;
 
     function checkEntranceGateDataReady() {
       if (gateSongsLoaded && gateCharactersLoaded) {
@@ -7355,7 +7405,7 @@
     /* ═══════════════════════════════════════════════════════════════════
        6.19 INITIALIZATION
        ═══════════════════════════════════════════════════════════════════ */
-    window.addEventListener('DOMContentLoaded', () => {
+    function bootstrapApp() {
       initTheme();
       initMusicVolume();
       previewMiniPlayerTrackInfo();
@@ -7367,12 +7417,20 @@
       updateDefaultPassHintUI();
 
       // Requirement 5: 8-second fallback timer so entrance gate never gets stuck if Firebase is slow/offline
-      gateFallbackTimer = setTimeout(() => {
-        markEntranceGateReady();
-      }, 8000);
+      if (!gateFallbackTimer && !entranceGateReady && !entranceGateDismissed) {
+        gateFallbackTimer = setTimeout(() => {
+          markEntranceGateReady();
+        }, 8000);
+      }
 
       initRealtimeFirestoreListeners();
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', bootstrapApp, { once: true });
+    } else {
+      bootstrapApp();
+    }
 
     window.addEventListener('ocean_store_updated', () => {
       renderCharacters();
