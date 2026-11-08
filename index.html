@@ -83,6 +83,12 @@
       --danger: #D45B7A;
       --success: #489B8C;
       --mobile-nav-height: 60px;
+      --popup-bg: #FFFFFF;
+      --popup-sub-bg: #F6FAFF;
+      --popup-border: #E3EDFA;
+      --popup-left-grad: linear-gradient(180deg, #EAF3FF 0%, #DCE9FB 100%);
+      --popup-left-top: #EAF3FF;
+      --scrim-bg: rgba(40, 60, 100, 0.28);
     }
 
     /* Dark Mode: "Biển Đêm Dịu" (Soft Bioluminescent Deep Sea, NOT Pitch Black) */
@@ -120,6 +126,12 @@
       --dune-4: rgba(23, 40, 88, 0.90);
       --danger: #F2829F;
       --success: #6CD4C2;
+      --popup-bg: #16224A;
+      --popup-sub-bg: #1E2D5E;
+      --popup-border: rgba(143, 180, 255, 0.22);
+      --popup-left-grad: linear-gradient(180deg, #1B2B5C 0%, #16224A 100%);
+      --popup-left-top: #1B2B5C;
+      --scrim-bg: rgba(5, 10, 30, 0.55);
     }
 
     /* 1.2 BASE & RESET */
@@ -932,13 +944,16 @@
 
     .filter-drawer-sheet {
       display: none;
+      position: relative;
+      z-index: 30;
       margin-top: 12px;
       padding: 20px 24px;
       border-radius: 24px;
-      background: var(--glass-card);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow-card);
+      background: var(--popup-bg);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: 1px solid var(--popup-border);
+      box-shadow: var(--shadow-soft);
       animation: gentleFadeIn 0.3s cubic-bezier(.22,1,.36,1);
     }
 
@@ -953,14 +968,21 @@
       width: 100%;
       padding: 9px 14px;
       border-radius: 14px;
-      border: 1px solid var(--line);
-      background: var(--glass-input);
+      border: 1px solid var(--popup-border);
+      background: var(--popup-sub-bg);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
       color: var(--ink-strong);
       font-family: inherit;
       font-size: 12.5px;
       font-weight: 300;
       outline: none;
       transition: border-color 0.2s ease;
+    }
+
+    .glass-select option {
+      background: var(--popup-bg);
+      color: var(--ink-strong);
     }
 
     .glass-select:focus,
@@ -1243,19 +1265,19 @@
       background: rgba(255, 255, 255, 0.2);
     }
 
-    /* 1.12 FLOATING MUSIC ORB & GLASS MINI PLAYER */
+    /* 1.12 FLOATING MUSIC ORB & SOLID MINI PLAYER */
     .music-floating-dock {
       position: fixed;
       bottom: calc(env(safe-area-inset-bottom, 0px) + 90px);
       right: 20px;
-      z-index: 1200;
+      z-index: 1500;
     }
 
     .music-orb-trigger {
       width: 48px;
       height: 48px;
       border-radius: 50%;
-      border: 1px solid rgba(255, 255, 255, 0.65);
+      border: 1px solid var(--popup-border);
       background: var(--accent);
       color: #FFFFFF;
       box-shadow: 0 10px 28px var(--accent-glow);
@@ -1298,23 +1320,23 @@
       overflow-y: auto;
       padding: 18px 20px;
       border-radius: 26px;
-      background: var(--glass-strong);
-      backdrop-filter: blur(24px) saturate(150%);
-      -webkit-backdrop-filter: blur(24px) saturate(150%);
-      border: 1px solid var(--line);
+      background: var(--popup-bg);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: 1px solid var(--popup-border);
       box-shadow: var(--shadow-soft);
       animation: gentleFadeIn 0.28s cubic-bezier(.22,1,.36,1);
-      z-index: 1201;
+      z-index: 1501;
     }
 
-    /* 1.13 MODALS (2-Column Rednote Profile Modal + Nocturne Chat Bubbles) */
+    /* 1.13 MODALS (2-Column Rednote Profile Modal + Nocturne Chat Bubbles - 100% Solid Opaque) */
     .modal-overlay {
       position: fixed;
       inset: 0;
       z-index: 2000;
-      background: rgba(22, 36, 68, 0.36);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: var(--scrim-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1331,10 +1353,10 @@
 
     .modal-glass-card {
       position: relative;
-      background: var(--glass-strong);
-      backdrop-filter: blur(28px) saturate(150%);
-      -webkit-backdrop-filter: blur(28px) saturate(150%);
-      border: 1px solid var(--line);
+      background: var(--popup-bg);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: 1px solid var(--popup-border);
       border-radius: 34px;
       box-shadow: var(--shadow-soft);
       width: 100%;
@@ -1351,6 +1373,59 @@
       transform: scale(1) translateY(0);
     }
 
+    /* Solid child panels, buttons, and tags inside popups/modals */
+    .modal-glass-card .glass-panel,
+    .filter-drawer-sheet .glass-panel,
+    .music-glass-popover .glass-panel {
+      background: var(--popup-sub-bg);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: 1px solid var(--popup-border);
+      box-shadow: none;
+    }
+
+    .modal-glass-card .btn-glass-pill,
+    .filter-drawer-sheet .btn-glass-pill,
+    .music-glass-popover .btn-glass-pill {
+      background: var(--popup-sub-bg);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: 1px solid var(--popup-border);
+      color: var(--ink-strong);
+    }
+
+    .modal-glass-card .btn-glass-pill:hover:not(:disabled),
+    .filter-drawer-sheet .btn-glass-pill:hover:not(:disabled),
+    .music-glass-popover .btn-glass-pill:hover:not(:disabled) {
+      background: var(--popup-bg);
+      color: var(--accent);
+      border-color: var(--accent-2);
+    }
+
+    .modal-glass-card .icon-btn,
+    .music-glass-popover .icon-btn {
+      background: var(--popup-sub-bg);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: 1px solid var(--popup-border);
+    }
+
+    .modal-glass-card .icon-btn:hover,
+    .modal-glass-card .icon-btn.active,
+    .music-glass-popover .icon-btn:hover,
+    .music-glass-popover .icon-btn.active {
+      background: var(--accent);
+      color: #FFFFFF;
+      border-color: var(--accent);
+    }
+
+    .modal-glass-card .tag-pill:not(.active),
+    .filter-drawer-sheet .tag-pill:not(.active) {
+      background: var(--popup-sub-bg);
+      border: 1px solid var(--popup-border);
+      color: var(--ink-soft);
+    }
+
     /* 2-Column Profile Modal Layout (Desktop >= 900px: 42% sticky left, 58% scrollable right) */
     .profile-split-layout {
       display: grid;
@@ -1359,6 +1434,7 @@
       max-height: 750px;
       min-height: 500px;
       overflow: hidden;
+      background: var(--popup-bg);
     }
 
     .profile-modal-close-fixed {
@@ -1369,11 +1445,11 @@
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      border: 1px solid var(--line);
-      background: var(--glass-strong);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      color: var(--ink);
+      border: 1px solid var(--popup-border);
+      background: var(--popup-bg);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      color: var(--ink-strong);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -1400,14 +1476,14 @@
       position: sticky;
       top: 0;
       height: 100%;
-      background: linear-gradient(165deg, var(--hero-sky-1) 0%, var(--hero-sky-2) 60%, var(--hero-sky-3) 100%);
+      background: var(--popup-left-grad);
       padding: 22px 24px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      border-right: 1px solid var(--line-subtle);
+      border-right: 1px solid var(--popup-border);
       overflow: hidden;
     }
 
@@ -1419,9 +1495,12 @@
       justify-content: space-between;
       position: relative;
       z-index: 4;
+      background: var(--popup-left-top);
+      padding: 4px 8px;
+      border-radius: 10px;
     }
 
-    /* 4 / 5 Portrait Frame with Blurred Self-Backdrop + Frosted Veil + Contain Foreground */
+    /* 4 / 5 Portrait Frame with Solid Pastel Gradient Background */
     .profile-portrait-frame {
       width: 100%;
       max-width: 340px;
@@ -1429,8 +1508,8 @@
       max-height: calc(84vh - 105px);
       border-radius: 28px;
       overflow: hidden;
-      background: linear-gradient(160deg, var(--hero-sky-1) 0%, var(--hero-sky-2) 55%, var(--hero-sky-3) 100%);
-      border: 1px solid var(--line);
+      background: var(--popup-left-grad);
+      border: 1px solid var(--popup-border);
       box-shadow: var(--shadow-card);
       position: relative;
       z-index: 2;
@@ -1443,32 +1522,11 @@
     }
 
     .portrait-blur-backdrop {
-      position: absolute;
-      inset: -18px;
-      width: calc(100% + 36px);
-      height: calc(100% + 36px);
-      object-fit: cover;
-      object-position: center;
-      filter: blur(28px) saturate(120%);
-      -webkit-filter: blur(28px) saturate(120%);
-      opacity: 0.6;
-      transform: scale(1.08);
-      pointer-events: none;
-      z-index: 1;
+      display: none;
     }
 
     .portrait-glass-veil {
-      position: absolute;
-      inset: 0;
-      background: rgba(255, 255, 255, 0.28);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    [data-theme="dark"] .portrait-glass-veil {
-      background: rgba(16, 28, 64, 0.34);
+      display: none;
     }
 
     .portrait-contain-img {
@@ -1478,13 +1536,14 @@
       height: 100%;
       object-fit: contain;
       border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--popup-border);
+      background: var(--popup-sub-bg);
       box-shadow: 0 12px 30px rgba(45, 75, 130, 0.14);
       transition: transform 0.35s cubic-bezier(.22,1,.36,1), opacity 0.42s ease;
     }
 
     [data-theme="dark"] .portrait-contain-img {
-      border-color: rgba(165, 198, 255, 0.28);
+      border-color: var(--popup-border);
       box-shadow: 0 12px 30px rgba(5, 10, 28, 0.38);
     }
 
@@ -1509,8 +1568,8 @@
       aspect-ratio: 4 / 5;
       border-radius: 18px;
       overflow: hidden;
-      background: linear-gradient(160deg, var(--hero-sky-1) 0%, var(--hero-sky-2) 55%, var(--hero-sky-3) 100%);
-      border: 1px solid var(--line);
+      background: var(--popup-left-grad);
+      border: 1px solid var(--popup-border);
       box-shadow: var(--shadow-card);
       padding: 7px;
       display: flex;
@@ -1529,9 +1588,9 @@
       position: fixed;
       inset: 0;
       z-index: 2700;
-      background: rgba(14, 24, 52, 0.74);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      background: var(--scrim-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1555,7 +1614,8 @@
       height: auto;
       object-fit: contain;
       border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.45);
+      border: 1px solid var(--popup-border);
+      background: var(--popup-bg);
       box-shadow: 0 24px 64px rgba(5, 10, 28, 0.45);
       transform: scale(0.94);
       transition: transform 0.34s cubic-bezier(.22,1,.36,1);
@@ -1571,6 +1631,7 @@
       height: 100%;
       min-height: 0;
       overflow: hidden;
+      background: var(--popup-bg);
     }
 
     .profile-scroll-content {
@@ -1580,6 +1641,7 @@
       display: flex;
       flex-direction: column;
       gap: 20px;
+      background: var(--popup-bg);
     }
 
     .profile-section-label {
@@ -1596,8 +1658,8 @@
     .profile-prose-box {
       padding: 14px 18px;
       border-radius: 18px;
-      background: var(--glass-bg);
-      border: 1px solid var(--line-subtle);
+      background: var(--popup-sub-bg);
+      border: 1px solid var(--popup-border);
       font-size: 13px;
       color: var(--ink);
       line-height: 1.7;
@@ -1627,8 +1689,8 @@
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background: var(--accent-soft-bg);
-      border: 1px solid var(--line);
+      background: var(--popup-sub-bg);
+      border: 1px solid var(--popup-border);
       color: var(--accent);
       font-family: 'Cormorant Garamond', serif;
       font-size: 13px;
@@ -1642,8 +1704,8 @@
     .chat-bubble-box {
       padding: 9px 14px;
       border-radius: 18px 18px 18px 4px;
-      background: var(--glass-card);
-      border: 1px solid var(--line);
+      background: var(--popup-sub-bg);
+      border: 1px solid var(--popup-border);
       font-size: 12.5px;
       color: var(--ink);
       line-height: 1.5;
@@ -1667,9 +1729,14 @@
 
     /* Rednote-style Bottom Sticky Bar inside Profile Modal */
     .profile-bottom-bar {
+      position: sticky;
+      bottom: 0;
+      z-index: 30;
       padding: 12px 24px;
-      border-top: 1px solid var(--line-subtle);
-      background: var(--glass-card);
+      border-top: 1px solid var(--popup-border);
+      background: var(--popup-bg);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -1691,10 +1758,11 @@
       pointer-events: auto;
       padding: 10px 18px;
       border-radius: 999px;
-      background: var(--glass-strong);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow-card);
+      background: var(--popup-bg);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      border: 1px solid var(--popup-border);
+      box-shadow: var(--shadow-soft);
       color: var(--ink-strong);
       font-size: 12.5px;
       display: flex;
@@ -1707,8 +1775,8 @@
     .donate-qr-glass-frame {
       padding: 14px;
       border-radius: 26px;
-      background: var(--glass-card);
-      border: 1px solid var(--line);
+      background: var(--popup-sub-bg);
+      border: 1px solid var(--popup-border);
       box-shadow: var(--shadow-card);
       display: inline-flex;
       flex-direction: column;
@@ -1750,9 +1818,9 @@
       position: fixed;
       inset: 0;
       z-index: 2600;
-      background: rgba(15, 26, 56, 0.68);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: var(--scrim-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1799,8 +1867,8 @@
     .donate-info-card {
       padding: 12px 16px;
       border-radius: 18px;
-      background: var(--glass-bg);
-      border: 1px solid var(--line-subtle);
+      background: var(--popup-sub-bg);
+      border: 1px solid var(--popup-border);
       margin-bottom: 16px;
       display: flex;
       flex-direction: column;
@@ -1871,12 +1939,16 @@
         height: auto;
         padding: 18px 20px 14px 20px;
         border-right: none;
-        border-bottom: 1px solid var(--line-subtle);
+        border-bottom: 1px solid var(--popup-border);
         flex-shrink: 0;
       }
       .profile-left-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
         max-width: 100%;
-        padding-right: 42px;
+        padding: 6px 44px 6px 8px;
+        background: var(--popup-left-top);
       }
       .profile-portrait-frame {
         width: 100%;
@@ -2600,7 +2672,7 @@
       </div>
 
       <!-- When No QR Image Yet: Line-art fish holding a heart -->
-      <div id="donate-empty-qr-view" style="display:none; padding:26px 18px; margin-bottom:16px; border-radius:24px; background:var(--glass-bg); border:1px solid var(--line-subtle);">
+      <div id="donate-empty-qr-view" style="display:none; padding:26px 18px; margin-bottom:16px; border-radius:24px; background:var(--popup-sub-bg); border:1px solid var(--popup-border);">
         <svg width="88" height="68" viewBox="0 0 96 74" fill="none" stroke="var(--accent)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 10px auto; display:block; opacity:0.85;">
           <!-- Gentle fish body -->
           <path d="M62 38C50 24 30 25 18 38C11 45 5 39 3 31C5 38 5 44 3 49C7 42 13 42 18 38C30 51 50 52 62 38Z" fill="var(--accent-soft-bg)"/>
@@ -2659,7 +2731,7 @@
       <h3 class="font-serif-display" style="font-size:24px; color:var(--ink-strong);">Mã Đồng Bộ Yêu Thích</h3>
       <p style="font-size:12.5px; color:var(--ink-soft); margin:6px 0 16px 0;">Sử dụng mã 8 ký tự này để mang danh sách nhân vật yêu thích của bạn sang thiết bị hoặc trình duyệt khác.</p>
 
-      <div style="padding:16px; border-radius:20px; background:var(--glass-bg); border:1px solid var(--line); text-align:center; margin-bottom:18px;">
+      <div style="padding:16px; border-radius:20px; background:var(--popup-sub-bg); border:1px solid var(--popup-border); text-align:center; margin-bottom:18px;">
         <span class="caption-micro">Mã của bạn</span>
         <div id="current-sync-code" class="font-serif-display" style="font-size:28px; letter-spacing:0.18em; color:var(--accent); margin:4px 0 8px 0;">OCEAN000</div>
         <button class="btn-glass-pill" onclick="copySyncCode()" style="padding:5px 14px; font-size:11.5px;">Sao chép mã</button>
@@ -2717,7 +2789,7 @@
 
           <p id="admin-auth-error-note" style="display:none; font-size:11.5px; color:var(--danger); line-height:1.5;"></p>
 
-          <div style="padding:10px 14px; border-radius:16px; background:var(--glass-bg); border:1px solid var(--line-subtle); font-size:11px; color:var(--ink-soft); line-height:1.55; width:100%;">
+          <div style="padding:10px 14px; border-radius:16px; background:var(--popup-sub-bg); border:1px solid var(--popup-border); font-size:11px; color:var(--ink-soft); line-height:1.55; width:100%;">
             <div>Người xem bình thường không cần đăng nhập vẫn xem được hồ sơ, nghe nhạc, thả tim và gửi bình luận trực tiếp.</div>
           </div>
         </div>
@@ -2843,7 +2915,7 @@
                 </div>
               </div>
 
-              <div style="padding:12px 14px; border-radius:16px; background:var(--glass-bg); border:1px solid var(--line-subtle);">
+              <div style="padding:12px 14px; border-radius:16px; background:var(--popup-sub-bg); border:1px solid var(--popup-border);">
                 <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; color:var(--ink-strong);">
                   <input type="checkbox" id="cf-isprivate" onchange="togglePrivateConfigFields(this.checked)">
                   <span>Thiết lập Hồ sơ Riêng tư (Yêu cầu giải câu đố để mở khóa cả 2 nút link)</span>
@@ -2970,8 +3042,8 @@
             </div>
 
             <!-- Current QR Preview Box -->
-            <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:12px 16px; border-radius:18px; background:var(--glass-bg); border:1px solid var(--line-subtle);">
-              <div id="adm-qr-preview-box" style="width:84px; height:84px; border-radius:14px; background:#FFFFFF; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; padding:6px;">
+            <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:12px 16px; border-radius:18px; background:var(--popup-sub-bg); border:1px solid var(--popup-border);">
+              <div id="adm-qr-preview-box" style="width:84px; height:84px; border-radius:14px; background:#FFFFFF; border:1px solid var(--popup-border); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; padding:6px;">
                 <img id="adm-donate-qr-preview" src="" alt="Preview QR" style="width:100%; height:100%; object-fit:contain; display:none;">
                 <span id="adm-donate-qr-empty" class="caption-micro" style="font-size:9px; text-align:center; line-height:1.3;">Chưa có QR</span>
               </div>
@@ -4454,7 +4526,7 @@
         if (idxById !== -1) currentTrackIdx = idxById;
       }
       list.innerHTML = tracks.map((t, idx) => `
-        <div onclick="selectTrack(${idx})" style="padding:5px 10px; border-radius:10px; cursor:pointer; font-size:11.5px; color:${idx === currentTrackIdx ? 'var(--accent)' : 'var(--ink-soft)'}; background:${idx === currentTrackIdx ? 'var(--accent-soft-bg)' : 'transparent'};">
+        <div onclick="selectTrack(${idx})" style="padding:6px 10px; border-radius:10px; cursor:pointer; font-size:11.5px; color:${idx === currentTrackIdx ? 'var(--accent)' : 'var(--ink-soft)'}; background:${idx === currentTrackIdx ? 'var(--popup-sub-bg)' : 'var(--popup-bg)'}; border:1px solid ${idx === currentTrackIdx ? 'var(--popup-border)' : 'transparent'};">
           0${idx + 1}. ${t.title}
         </div>
       `).join('');
@@ -5101,7 +5173,7 @@
         : (hasPass ? 'Giải câu đố bí mật để mở khóa liên kết' : 'Hồ sơ riêng tư');
 
       const riddleHtml = showPrivateBox ? `
-        <div style="padding:14px 16px; border-radius:20px; background:var(--glass-card); border:1px solid var(--line); display:flex; flex-direction:column; gap:8px;">
+        <div style="padding:14px 16px; border-radius:20px; background:var(--popup-sub-bg); border:1px solid var(--popup-border); display:flex; flex-direction:column; gap:8px;">
           <div style="display:flex; align-items:center; gap:8px; color:var(--ink-strong); font-size:13px;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.6"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             <span>${noticeText}</span>
